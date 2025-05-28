@@ -1,13 +1,14 @@
 use crate::expression::Expression;
+use crate::span::AstSpan;
 use crate::visitor::ExpressionVisitor;
-use scanner::token::Token;
+use scanner::Token;
 use types::KirinType;
 
 #[derive(Debug, Clone)]
 pub struct Unary {
     pub operator: Token,
     pub right: Expression,
-    pub inferred_type: Option<KirinType>
+    pub inferred_type: Option<KirinType>,
 }
 
 impl Unary {
@@ -16,6 +17,10 @@ impl Unary {
     }
 
     pub fn new(right: Expression, operator: Token) -> Self {
-        Self { operator, right, inferred_type: None }
+        Self {
+            operator,
+            right,
+            inferred_type: None,
+        }
     }
 }

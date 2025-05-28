@@ -1,9 +1,9 @@
-#[derive(Clone, Debug, PartialEq, PartialOrd)]
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd)]
 pub struct TokenSpan {
-    pub line : usize,
-    pub column : usize,
-    pub start : usize,
-    pub end : usize,
+    pub line: usize,
+    pub column: usize,
+    pub start: usize,
+    pub end: usize,
 }
 
 impl Default for TokenSpan {

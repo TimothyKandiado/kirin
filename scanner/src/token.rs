@@ -1,5 +1,5 @@
-use std::fmt::Display;
 use crate::span::TokenSpan;
+use std::fmt::Display;
 
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub enum TokenType {
@@ -57,7 +57,7 @@ pub enum TokenType {
 pub struct Token {
     pub token_type: TokenType,
     pub lexeme: String,
-    pub span: TokenSpan
+    pub span: TokenSpan,
 }
 
 impl Display for Token {

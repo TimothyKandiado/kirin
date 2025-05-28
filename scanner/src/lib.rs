@@ -1,9 +1,9 @@
-pub mod token;
 mod span;
+mod token;
 
-use errors::{KirinError, ScanError};
-use token::{Token, TokenType};
-use crate::span::TokenSpan;
+use errors::{KirinError, SpannedError};
+pub use span::TokenSpan;
+pub use token::{Token, TokenType};
 
 fn simple_token(token_type: TokenType, span: TokenSpan) -> Token {
     Token {
@@ -18,6 +18,10 @@ pub struct TokenContainer {
     pub filename: String,
 }
 
+pub fn scan_tokens(source: &str) -> Result<Vec<Token>, KirinError> {
+    Scanner::new().scan_tokens(source)
+}
+
 pub struct Scanner {
     source: String,
 
@@ -25,7 +29,7 @@ pub struct Scanner {
     current: usize,
 
     line: usize,
-    column: usize,
+    line_start: usize,
 }
 
 impl Default for Scanner {
@@ -41,7 +45,7 @@ impl Scanner {
             start: 0,
             current: 0,
             line: 1,
-            column: 1,
+            line_start: 1,
         }
     }
 
@@ -85,14 +89,16 @@ impl Scanner {
     }
 
     fn generate_error(&self, message: String) -> KirinError {
-        KirinError::Scan(ScanError {
+        KirinError::Scan(SpannedError {
             message,
             line: self.line,
+            column: self.start,
         })
     }
 
     fn scan_token(&mut self) -> Result<Token, KirinError> {
         let newline_token = self.skip_whitespace();
+
         if let Some(newline) = newline_token {
             return Ok(newline);
         }
@@ -194,7 +200,7 @@ impl Scanner {
                 '\n' => {
                     has_consumed_newline = true;
                     self.line += 1;
-                    self.column = 0;
+                    self.line_start = self.current + 1;
                     self.advance();
                 }
 
@@ -202,7 +208,10 @@ impl Scanner {
                     while !self.is_at_end() && self.peek() != '\n' {
                         self.advance();
                     }
+
+                    has_consumed_newline = true;
                     self.line += 1;
+                    self.line_start = self.current + 1;
                     self.advance();
                 }
 
@@ -211,7 +220,6 @@ impl Scanner {
         }
 
         if has_consumed_newline {
-            self.column = 0;
             Some(simple_token(TokenType::NewLine, self.get_span()))
         } else {
             None
@@ -221,9 +229,9 @@ impl Scanner {
     fn get_span(&self) -> TokenSpan {
         TokenSpan {
             line: self.line,
-            column: self.column,
+            column: self.start.saturating_sub(self.line_start) + 1,
             start: self.start,
-            end: self.current
+            end: self.current,
         }
     }
 
@@ -340,7 +348,6 @@ impl Scanner {
         }
 
         self.current += 1;
-        self.column += 1;
         self.source.chars().nth(self.current - 1).unwrap()
     }
 
@@ -367,18 +374,24 @@ fn is_identifier_rest(character: char) -> bool {
 }
 #[cfg(test)]
 mod scanner_tests {
-    use crate::span::TokenSpan;
     use super::{Scanner, simple_token};
+    use crate::span::TokenSpan;
     use crate::token::{Token, TokenType};
 
     fn assert_scanned_tokens(left: Vec<Token>, right: Vec<Token>) {
-        let mapped_left = left.iter().map(|v| {
-            return (v.token_type, &v.lexeme);
-        }).collect::<Vec<(TokenType, &String)>>();
+        let mapped_left = left
+            .iter()
+            .map(|v| {
+                return (v.token_type, &v.lexeme);
+            })
+            .collect::<Vec<(TokenType, &String)>>();
 
-        let mapped_right = right.iter().map(|v| {
-            return (v.token_type, &v.lexeme);
-        }).collect::<Vec<(TokenType, &String)>>();
+        let mapped_right = right
+            .iter()
+            .map(|v| {
+                return (v.token_type, &v.lexeme);
+            })
+            .collect::<Vec<(TokenType, &String)>>();
 
         assert_eq!(mapped_left, mapped_right);
     }
@@ -394,19 +407,19 @@ mod scanner_tests {
                 Token {
                     token_type: TokenType::Number,
                     lexeme: "100".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 Token {
                     token_type: TokenType::NewLine,
                     lexeme: "".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 Token {
                     token_type: TokenType::Eof,
                     lexeme: "".to_string(),
-                    span: TokenSpan::default()
-                }
-            ]
+                    span: TokenSpan::default(),
+                },
+            ],
         )
     }
 
@@ -421,19 +434,19 @@ mod scanner_tests {
                 Token {
                     token_type: TokenType::Identifier,
                     lexeme: "sin".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 Token {
                     token_type: TokenType::NewLine,
                     lexeme: "".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 Token {
                     token_type: TokenType::Eof,
                     lexeme: "".to_string(),
-                    span: TokenSpan::default()
-                }
-            ]
+                    span: TokenSpan::default(),
+                },
+            ],
         )
     }
 
@@ -448,39 +461,39 @@ mod scanner_tests {
                 Token {
                     token_type: TokenType::For,
                     lexeme: "".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 Token {
                     token_type: TokenType::While,
                     lexeme: "".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 Token {
                     token_type: TokenType::NewLine,
                     lexeme: "".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 Token {
                     token_type: TokenType::Fn,
                     lexeme: "".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 Token {
                     token_type: TokenType::End,
                     lexeme: "".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 Token {
                     token_type: TokenType::NewLine,
                     lexeme: "".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 Token {
                     token_type: TokenType::Eof,
                     lexeme: "".to_string(),
-                    span: TokenSpan::default()
-                }
-            ]
+                    span: TokenSpan::default(),
+                },
+            ],
         )
     }
 
@@ -495,59 +508,59 @@ mod scanner_tests {
                 Token {
                     token_type: TokenType::Number,
                     lexeme: "1".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 Token {
                     token_type: TokenType::Plus,
                     lexeme: "".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 Token {
                     token_type: TokenType::Number,
                     lexeme: "2".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 Token {
                     token_type: TokenType::Slash,
                     lexeme: "".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 Token {
                     token_type: TokenType::LeftParen,
                     lexeme: "".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 Token {
                     token_type: TokenType::Number,
                     lexeme: "3".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 Token {
                     token_type: TokenType::Plus,
                     lexeme: "".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 Token {
                     token_type: TokenType::Number,
                     lexeme: "1".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 Token {
                     token_type: TokenType::RightParen,
                     lexeme: "".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 Token {
                     token_type: TokenType::NewLine,
                     lexeme: "".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 Token {
                     token_type: TokenType::Eof,
                     lexeme: "".to_string(),
-                    span: TokenSpan::default()
-                }
-            ]
+                    span: TokenSpan::default(),
+                },
+            ],
         )
     }
 
@@ -568,14 +581,14 @@ mod scanner_tests {
                 Token {
                     token_type: TokenType::NewLine,
                     lexeme: "".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 Token {
                     token_type: TokenType::Eof,
                     lexeme: "".to_string(),
-                    span: TokenSpan::default()
-                }
-            ]
+                    span: TokenSpan::default(),
+                },
+            ],
         )
     }
 
@@ -593,8 +606,8 @@ mod scanner_tests {
                 simple_token(TokenType::And, TokenSpan::default()),
                 simple_token(TokenType::Or, TokenSpan::default()),
                 simple_token(TokenType::NewLine, TokenSpan::default()),
-                simple_token(TokenType::Eof, TokenSpan::default())
-            ]
+                simple_token(TokenType::Eof, TokenSpan::default()),
+            ],
         )
     }
 
@@ -610,18 +623,18 @@ mod scanner_tests {
                 Token {
                     token_type: TokenType::Number,
                     lexeme: "1".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 simple_token(TokenType::Comma, TokenSpan::default()),
                 Token {
                     token_type: TokenType::Number,
                     lexeme: "2".to_string(),
-                    span: TokenSpan::default()
+                    span: TokenSpan::default(),
                 },
                 simple_token(TokenType::RightBracket, TokenSpan::default()),
                 simple_token(TokenType::NewLine, TokenSpan::default()),
-                simple_token(TokenType::Eof, TokenSpan::default())
-            ]
+                simple_token(TokenType::Eof, TokenSpan::default()),
+            ],
         )
     }
 }

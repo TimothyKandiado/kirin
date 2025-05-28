@@ -1,11 +1,11 @@
 use crate::visitor::ExpressionVisitor;
-use scanner::token::Token;
+use scanner::Token;
 use types::KirinType;
 
 #[derive(Debug, Clone)]
 pub struct Variable {
     pub name: Token,
-    pub inferred_type: Option<KirinType>
+    pub inferred_type: Option<KirinType>,
 }
 
 impl Variable {
@@ -14,6 +14,9 @@ impl Variable {
     }
 
     pub fn new(name: Token) -> Self {
-        Self { name , inferred_type: None }
+        Self {
+            name,
+            inferred_type: None,
+        }
     }
 }
