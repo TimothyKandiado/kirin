@@ -71,7 +71,7 @@ impl Parser {
     fn expression_statement(&mut self) -> Result<Statement, KirinError> {
         let expression = self.expression()?;
 
-        self.consume(TokenType::NewLine, "Expect newline after statement")?;
+        self.consume(TokenType::NewLine)?;
         Ok(Statement::ExpressionStatement(expression))
     }
 
@@ -241,7 +241,7 @@ impl Parser {
         let arguments = self.get_arguments()?;
 
         let paren = self
-            .consume(TokenType::RightParen, "Expect ')' after arguments")?
+            .consume(TokenType::RightParen)?
             .clone();
         Ok(Expression::Call(Box::new(Call::new(
             callee, paren, arguments,
@@ -274,7 +274,7 @@ impl Parser {
 
         if self.match_tokens(&[TokenType::LeftParen]) {
             let expression = self.expression()?;
-            let token = self.consume(TokenType::RightParen, "Expect ')' after expression")?;
+            let token = self.consume(TokenType::RightParen)?;
 
             return Ok(Expression::Grouping(Box::new(Grouping::new(
                 expression,
@@ -282,8 +282,12 @@ impl Parser {
             ))));
         }
 
+        if self.match_tokens(&[TokenType::NewLine]) {
+            return self.primary();
+        }
+
         let current = self.peek().clone();
-        Err(self.error_from_token_span(current.span, "Expect Expression"))
+        Err(self.error_from_token_span(current.span, &format!("expected Expression but found `{:?}`", current.token_type)))
     }
 
     fn synchronize(&mut self) {
@@ -332,13 +336,13 @@ impl Parser {
     fn consume(
         &mut self,
         token_type: TokenType,
-        error_message: &str,
     ) -> Result<&Token, KirinError> {
         if self.check(token_type) {
             return Ok(self.advance());
         }
+
         let previous = self.previous().clone();
-        Err(self.error_from_token_span(previous.span, error_message))
+        Err(self.error_from_token_span(previous.span, &format!("expected {:?}, got {:?}", token_type, previous.token_type)))
     }
 
     /// Check if the current token is of the given type
