@@ -1,4 +1,4 @@
-use crate::expression::{Assign, Binary, Call, Expression, Grouping, Literal, Unary, Variable};
+use crate::expression::{Assign, Binary, BinaryOp, Call, Expression, Grouping, Literal, Unary, Variable};
 use crate::span::AstSpan;
 use crate::statements::Statement;
 use crate::value::ParsedValue;
@@ -101,10 +101,16 @@ impl Parser {
         let expression = self.and()?;
 
         if self.match_tokens(&[TokenType::Or]) {
-            let operator = self.previous().clone();
+            let operator_token = self.previous();
+
+            let operator = BinaryOp::from_token(operator_token)?;
+            let span = AstSpan::from_token_span(operator_token.span, self.filename.clone());
+
             let right = self.and()?;
 
-            let binary = Expression::Binary(Box::new(Binary::new(expression, right, operator)));
+
+
+            let binary = Expression::Binary(Box::new(Binary::new(expression, right, operator, span)));
             return Ok(binary);
         }
 
@@ -115,10 +121,14 @@ impl Parser {
         let expression = self.equality()?;
 
         if self.match_tokens(&[TokenType::And]) {
-            let operator = self.previous().clone();
+            let operator_token = self.previous();
+
+            let operator = BinaryOp::from_token(operator_token)?;
+            let span = AstSpan::from_token_span(operator_token.span, self.filename.clone());
+
             let right = self.equality()?;
 
-            let binary = Expression::Binary(Box::new(Binary::new(expression, right, operator)));
+            let binary = Expression::Binary(Box::new(Binary::new(expression, right, operator, span)));
             return Ok(binary);
         }
 
@@ -129,10 +139,14 @@ impl Parser {
         let expression = self.comparison()?;
 
         if self.match_tokens(&[TokenType::EqualEqual, TokenType::NotEqual]) {
-            let operator = self.previous().clone();
+            let operator_token = self.previous();
+
+            let operator = BinaryOp::from_token(operator_token)?;
+            let span = AstSpan::from_token_span(operator_token.span, self.filename.clone());
+
             let right = self.comparison()?;
 
-            let binary = Expression::Binary(Box::new(Binary::new(expression, right, operator)));
+            let binary = Expression::Binary(Box::new(Binary::new(expression, right, operator, span)));
             return Ok(binary);
         }
 
@@ -148,10 +162,14 @@ impl Parser {
             TokenType::Less,
             TokenType::LessEqual,
         ]) {
-            let operator = self.previous().clone();
+            let operator_token = self.previous();
+
+            let operator = BinaryOp::from_token(operator_token)?;
+            let span = AstSpan::from_token_span(operator_token.span, self.filename.clone());
+
             let right = self.addition()?;
 
-            let binary = Expression::Binary(Box::new(Binary::new(expression, right, operator)));
+            let binary = Expression::Binary(Box::new(Binary::new(expression, right, operator, span)));
             return Ok(binary);
         }
 
@@ -162,10 +180,14 @@ impl Parser {
         let mut expression = self.multiplication()?;
 
         while self.match_tokens(&[TokenType::Minus, TokenType::Plus]) {
-            let operator = self.previous().to_owned();
+            let operator_token = self.previous();
+
+            let operator = BinaryOp::from_token(operator_token)?;
+            let span = AstSpan::from_token_span(operator_token.span, self.filename.clone());
+
             let right = self.multiplication()?;
 
-            expression = Expression::Binary(Box::new(Binary::new(expression, right, operator)))
+            expression = Expression::Binary(Box::new(Binary::new(expression, right, operator, span)))
         }
 
         Ok(expression)
@@ -175,10 +197,14 @@ impl Parser {
         let mut expression = self.power()?;
 
         while self.match_tokens(&[TokenType::Star, TokenType::Slash, TokenType::Percent]) {
-            let operator = self.previous().to_owned();
+            let operator_token = self.previous();
+
+            let operator = BinaryOp::from_token(operator_token)?;
+            let span = AstSpan::from_token_span(operator_token.span, self.filename.clone());
+
             let right = self.unary()?;
 
-            expression = Expression::Binary(Box::new(Binary::new(expression, right, operator)))
+            expression = Expression::Binary(Box::new(Binary::new(expression, right, operator, span)))
         }
 
         Ok(expression)
@@ -188,10 +214,14 @@ impl Parser {
         let mut expression = self.unary()?;
 
         while self.match_tokens(&[TokenType::Caret]) {
-            let operator = self.previous().to_owned();
+            let operator_token = self.previous();
+
+            let operator = BinaryOp::from_token(operator_token)?;
+            let span = AstSpan::from_token_span(operator_token.span, self.filename.clone());
+
             let right = self.unary()?;
 
-            expression = Expression::Binary(Box::new(Binary::new(expression, right, operator)))
+            expression = Expression::Binary(Box::new(Binary::new(expression, right, operator, span)))
         }
 
         Ok(expression)

@@ -1,5 +1,5 @@
 pub use crate::expression::assignment::Assign;
-pub use crate::expression::binary::Binary;
+pub use crate::expression::binary::{Binary, BinaryOp};
 pub use crate::expression::call::Call;
 pub use crate::expression::grouping::Grouping;
 pub use crate::expression::literal::Literal;
