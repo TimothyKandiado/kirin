@@ -7,16 +7,15 @@ use types::KirinType;
 #[derive(Debug, Clone)]
 pub struct Call {
     pub callee: Expression,
-    pub paren: Token,
+    pub span: AstSpan,
     pub arguments: Vec<Expression>,
     pub inferred_type: Option<KirinType>,
 }
-
 impl Call {
-    pub fn new(callee: Expression, paren: Token, arguments: Vec<Expression>) -> Self {
+    pub fn new(callee: Expression, span: AstSpan, arguments: Vec<Expression>) -> Self {
         Self {
             callee,
-            paren,
+            span,
             arguments,
             inferred_type: None,
         }

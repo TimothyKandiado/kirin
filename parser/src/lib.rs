@@ -1,4 +1,4 @@
-use crate::expression::{Assign, Binary, BinaryOp, Call, Expression, Grouping, Literal, Unary, Variable};
+use crate::expression::{Assign, Binary, BinaryOp, Call, Expression, Grouping, Literal, Unary, UnaryOp, Variable};
 use crate::span::AstSpan;
 use crate::statements::Statement;
 use crate::value::ParsedValue;
@@ -84,14 +84,17 @@ impl Parser {
 
         if self.match_tokens(&[TokenType::Equal]) {
             let equals = self.previous().clone();
+
+            let span = AstSpan::from_token_span(equals.span, self.filename.clone());
+
             let value = self.assignment()?;
 
             if let Expression::Variable(variable) = &expression {
                 let name = variable.name.clone();
-                return Ok(Expression::Assign(Box::new(Assign::new(name, value))));
+                return Ok(Expression::Assign(Box::new(Assign::new(name, value, span))));
             }
 
-            return Err(self.error_from_token_span(equals.span, "Invalid Assignment Target"));
+            return Err(self.error_from_token_span(equals.span, "invalid assignment target"));
         }
 
         Ok(expression)
@@ -228,11 +231,15 @@ impl Parser {
     }
 
     fn unary(&mut self) -> Result<Expression, KirinError> {
-        if self.match_tokens(&[TokenType::Minus]) {
-            let operator = self.previous().to_owned();
+        if self.match_tokens(&[TokenType::Minus, TokenType::Not]) {
+            let operator_token = self.previous();
+
+            let operator = UnaryOp::from_token(operator_token)?;
+            let span = AstSpan::from_token_span(operator_token.span, self.filename.clone());
+
             let right = self.unary()?;
 
-            return Ok(Expression::Unary(Box::new(Unary::new(right, operator))));
+            return Ok(Expression::Unary(Box::new(Unary::new(right, operator, span))));
         }
 
         self.call()
@@ -271,10 +278,11 @@ impl Parser {
         let arguments = self.get_arguments()?;
 
         let paren = self
-            .consume(TokenType::RightParen)?
-            .clone();
+            .consume(TokenType::RightParen)?;
+
+        let span = AstSpan::from_token_span(paren.span, self.filename.clone());
         Ok(Expression::Call(Box::new(Call::new(
-            callee, paren, arguments,
+            callee, span, arguments,
         ))))
     }
 
@@ -283,7 +291,9 @@ impl Parser {
         if self.match_tokens(&[TokenType::Identifier]) {
             let token = self.previous().clone();
 
-            return Ok(Expression::Variable(Box::new(Variable::new(token))));
+            let span = AstSpan::from_token_span(token.span, self.filename.clone());
+
+            return Ok(Expression::Variable(Box::new(Variable::new(token.lexeme, span))));
         }
 
         // Handle literals
