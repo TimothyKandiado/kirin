@@ -1,11 +1,11 @@
-use crate::expression::{Assign, Binary, BinaryOp, Call, Expression, Grouping, Literal, Unary, UnaryOp, Variable};
+use crate::expressions::{Assign, Binary, BinaryOp, Call, Expression, Grouping, Literal, Unary, UnaryOp, Variable};
 use crate::span::AstSpan;
-use crate::statements::Statement;
+use crate::statements::{Statement, VariableDeclaration};
 use crate::value::ParsedValue;
 use errors::{KirinError, SpannedError};
 use scanner::{Token, TokenSpan, TokenType};
 
-mod expression;
+mod expressions;
 mod span;
 mod statements;
 mod value;
@@ -61,7 +61,38 @@ impl Parser {
     }
 
     fn declaration(&mut self) -> Result<Statement, KirinError> {
-        self.statement()
+        if self.match_tokens(&[TokenType::NewLine]) { // skip trailing new line tokens
+            self.declaration()
+        } else if self.match_tokens(&[TokenType::Let]) {
+            self.var_declaration()
+        }
+        else if self.check_next(TokenType::ColonEqual) {
+            self.var_declaration()
+        } else {
+            self.statement()
+        }
+    }
+
+    fn var_declaration(&mut self) -> Result<Statement, KirinError> {
+        let name = self
+            .consume(TokenType::Identifier)?.clone();
+
+        let mut initializer = None;
+
+        if self.match_tokens(&[TokenType::Equal, TokenType::ColonEqual]) {
+            initializer = Some(self.expression()?);
+        }
+
+        self.consume(
+            TokenType::NewLine
+        )?;
+
+        let span = AstSpan::from_token_span(name.span, self.filename.clone());
+        Ok(Statement::VarDeclaration(VariableDeclaration {
+            name: name.lexeme.clone(),
+            initializer,
+            span
+        }))
     }
 
     fn statement(&mut self) -> Result<Statement, KirinError> {

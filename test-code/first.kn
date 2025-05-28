@@ -1,8 +1,8 @@
 # first.kn
-first = 40 - 9
+first := 40 - 9
 
 # Comment
 
-second = first * 300
-third = first / second
+second := first * 300
+third := first / second
 

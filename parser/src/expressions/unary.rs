@@ -1,5 +1,5 @@
 use errors::{KirinError, SpannedError};
-use crate::expression::Expression;
+use crate::expressions::Expression;
 use crate::span::AstSpan;
 use crate::visitor::ExpressionVisitor;
 use scanner::{Token, TokenType};

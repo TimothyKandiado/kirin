@@ -1,4 +1,5 @@
-use crate::expression::{Assign, Binary, Call, Grouping, Literal, Unary, Variable};
+use crate::expressions::{Assign, Binary, Call, Expression, Grouping, Literal, Unary, Variable};
+use crate::statements::VariableDeclaration;
 
 pub trait ExpressionVisitor {
     type Output;
@@ -9,4 +10,12 @@ pub trait ExpressionVisitor {
     fn visit_call(&mut self, math_function: &Call) -> Self::Output;
     fn visit_variable(&mut self, variable: &Variable) -> Self::Output;
     fn visit_assign(&mut self, assign: &Assign) -> Self::Output;
+}
+
+pub trait StatementVisitor {
+    type Output;
+
+    fn visit_none(&mut self) -> Self::Output;
+    fn visit_var_declaration(&mut self, var_declaration: &VariableDeclaration) -> Self::Output;
+    fn visit_expression_statement(&mut self, expression_statement: &Expression) -> Self::Output;
 }

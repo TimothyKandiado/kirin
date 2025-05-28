@@ -1,10 +1,10 @@
-pub use crate::expression::assignment::Assign;
-pub use crate::expression::binary::{Binary, BinaryOp};
-pub use crate::expression::call::Call;
-pub use crate::expression::grouping::Grouping;
-pub use crate::expression::literal::Literal;
-pub use crate::expression::unary::{Unary, UnaryOp};
-pub use crate::expression::variable::Variable;
+pub use crate::expressions::assignment::Assign;
+pub use crate::expressions::binary::{Binary, BinaryOp};
+pub use crate::expressions::call::Call;
+pub use crate::expressions::grouping::Grouping;
+pub use crate::expressions::literal::Literal;
+pub use crate::expressions::unary::{Unary, UnaryOp};
+pub use crate::expressions::variable::Variable;
 
 use crate::visitor::ExpressionVisitor;
 

@@ -1,27 +1,28 @@
-use crate::expression::Expression;
-use crate::span::AstSpan;
+use crate::expressions::Expression;
 use crate::visitor::ExpressionVisitor;
 use scanner::Token;
 use types::KirinType;
+use crate::span::AstSpan;
 
 #[derive(Debug, Clone)]
-pub struct Call {
-    pub callee: Expression,
+pub struct Assign {
+    pub name: String,
     pub span: AstSpan,
-    pub arguments: Vec<Expression>,
+    pub value: Expression,
     pub inferred_type: Option<KirinType>,
 }
-impl Call {
-    pub fn new(callee: Expression, span: AstSpan, arguments: Vec<Expression>) -> Self {
+
+impl Assign {
+    pub fn new(name: String, value: Expression, span: AstSpan) -> Self {
         Self {
-            callee,
+            name,
+            value,
             span,
-            arguments,
             inferred_type: None,
         }
     }
 
     pub fn accept<T>(&self, visitor: &mut impl ExpressionVisitor<Output = T>) -> T {
-        visitor.visit_call(self)
+        visitor.visit_assign(self)
     }
 }
