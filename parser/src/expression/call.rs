@@ -1,12 +1,14 @@
 use crate::expression::Expression;
 use crate::visitor::ExpressionVisitor;
 use scanner::token::Token;
+use types::KirinType;
 
 #[derive(Debug, Clone)]
 pub struct Call {
     pub callee: Expression,
     pub paren: Token,
     pub arguments: Vec<Expression>,
+    pub inferred_type: Option<KirinType>
 }
 
 impl Call {
@@ -15,8 +17,10 @@ impl Call {
             callee,
             paren,
             arguments,
+            inferred_type: None
         }
     }
+
     pub fn accept<T>(&self, visitor: &mut impl ExpressionVisitor<Output = T>) -> T {
         visitor.visit_call(self)
     }

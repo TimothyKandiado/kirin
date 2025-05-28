@@ -1,9 +1,11 @@
+use types::KirinType;
 use crate::expression::Expression;
 use crate::visitor::ExpressionVisitor;
 
 #[derive(Debug, Clone)]
 pub struct Grouping {
     pub expression: Expression,
+    pub inferred_type: Option<KirinType>
 }
 
 impl Grouping {
@@ -12,6 +14,6 @@ impl Grouping {
     }
 
     pub fn new(expression: Expression) -> Self {
-        Self { expression }
+        Self { expression, inferred_type: None }
     }
 }

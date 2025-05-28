@@ -1,4 +1,8 @@
 mod expression;
-mod object;
+mod value;
 mod statements;
 mod visitor;
+
+struct Parser {
+
+}

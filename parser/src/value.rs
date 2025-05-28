@@ -1,9 +1,9 @@
 #[derive(Debug, Clone)]
-pub enum ParsedObject {
+pub enum ParsedValue {
     String(String),
     Float(f64),
     Int(i64),
     Bool(bool),
-    Slice(Vec<ParsedObject>),
-    Vector(Vec<ParsedObject>),
+    Slice(Vec<ParsedValue>),
+    Vector(Vec<ParsedValue>),
 }

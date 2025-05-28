@@ -1,9 +1,11 @@
-use crate::object::ParsedObject;
+use types::KirinType;
+use crate::value::ParsedValue;
 use crate::visitor::ExpressionVisitor;
 
 #[derive(Debug, Clone)]
 pub struct Literal {
-    pub object: ParsedObject,
+    pub value: ParsedValue,
+    pub inferred_type: Option<KirinType>
 }
 
 impl Literal {
@@ -11,7 +13,7 @@ impl Literal {
         visitor.visit_literal(self)
     }
 
-    pub fn new(object: ParsedObject) -> Self {
-        Self { object }
+    pub fn new(value: ParsedValue) -> Self {
+        Self { value, inferred_type: None }
     }
 }
