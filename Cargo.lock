@@ -7,8 +7,20 @@ name = "errors"
 version = "0.1.0"
 
 [[package]]
+name = "parser"
+version = "0.1.0"
+dependencies = [
+ "errors",
+ "scanner",
+]
+
+[[package]]
 name = "scanner"
 version = "0.1.0"
 dependencies = [
  "errors",
 ]
+
+[[package]]
+name = "types"
+version = "0.1.0"

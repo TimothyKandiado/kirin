@@ -1,7 +1,7 @@
 pub mod token;
 
-use token::{Token, TokenType};
 use errors::{KirinError, ScanError};
+use token::{Token, TokenType};
 
 fn simple_token(token_type: TokenType, line: usize) -> Token {
     Token {
@@ -40,13 +40,17 @@ impl Scanner {
         }
     }
 
-    pub fn scan_tokens_with_filename(self, source: &str, filename: &str) -> Result<TokenContainer, KirinError> {
+    pub fn scan_tokens_with_filename(
+        self,
+        source: &str,
+        filename: &str,
+    ) -> Result<TokenContainer, KirinError> {
         let scanned_tokens = self.scan_tokens(source)?;
         let filename = filename.to_string();
 
         Ok(TokenContainer {
             scanned_tokens,
-            filename
+            filename,
         })
     }
 
@@ -76,12 +80,10 @@ impl Scanner {
     }
 
     fn generate_error(&self, message: String) -> KirinError {
-        KirinError::Scan(
-            ScanError {
-                message,
-                line: self.line,
-            }
-        )
+        KirinError::Scan(ScanError {
+            message,
+            line: self.line,
+        })
     }
 
     fn scan_token(&mut self) -> Result<Token, KirinError> {
@@ -100,9 +102,12 @@ impl Scanner {
             '/' => Ok(simple_token(TokenType::Slash, self.line)),
             '^' => Ok(simple_token(TokenType::Caret, self.line)),
             '%' => Ok(simple_token(TokenType::Percent, self.line)),
-
             '(' => Ok(simple_token(TokenType::LeftParen, self.line)),
             ')' => Ok(simple_token(TokenType::RightParen, self.line)),
+            '{' => Ok(simple_token(TokenType::LeftBrace, self.line)),
+            '}' => Ok(simple_token(TokenType::RightBrace, self.line)),
+            '[' => Ok(simple_token(TokenType::LeftBracket, self.line)),
+            ']' => Ok(simple_token(TokenType::RightBracket, self.line)),
             ':' => {
                 if self.peek() == '=' {
                     self.advance();
@@ -120,13 +125,13 @@ impl Scanner {
                     return Ok(simple_token(TokenType::And, self.line));
                 }
 
-                Err(self.generate_error(format!("Unexpected token {}", current_character)))
+                Err(self.generate_error(format!("Unexpected character {}", current_character)))
             }
 
             '|' => {
                 let next = self.advance();
                 if next != '|' {
-                    return Err(self.generate_error("Unknown token '|' ".to_string()));
+                    return Err(self.generate_error("Unknown character '|' ".to_string()));
                 }
 
                 Ok(simple_token(TokenType::Or, self.line))
@@ -168,7 +173,7 @@ impl Scanner {
             x if x.is_ascii_digit() => self.scan_number(),
             x if is_identifier_start(x) => self.scan_identifier(),
 
-            _ => Err(self.generate_error(format!("Unknown token {}", current_character))),
+            _ => Err(self.generate_error(format!("Unknown character {}", current_character))),
         }
     }
 
@@ -337,8 +342,8 @@ fn is_identifier_rest(character: char) -> bool {
 }
 #[cfg(test)]
 mod scanner_tests {
+    use super::{Scanner, simple_token};
     use crate::token::{Token, TokenType};
-    use super::{simple_token, Scanner};
 
     #[test]
     fn test_scanner_number() {
@@ -549,6 +554,33 @@ mod scanner_tests {
                 simple_token(TokenType::Not, 1),
                 simple_token(TokenType::And, 1),
                 simple_token(TokenType::Or, 1),
+                simple_token(TokenType::NewLine, 1),
+                simple_token(TokenType::Eof, 1)
+            ]
+        )
+    }
+
+    #[test]
+    fn test_scanner_brackets() {
+        let source = "[1, 2]";
+        let tokens = Scanner::new().scan_tokens(source).unwrap();
+
+        assert_eq!(
+            tokens,
+            vec![
+                simple_token(TokenType::LeftBracket, 1),
+                Token {
+                    token_type: TokenType::Number,
+                    lexeme: "1".to_string(),
+                    line: 1
+                },
+                simple_token(TokenType::Comma, 1),
+                Token {
+                    token_type: TokenType::Number,
+                    lexeme: "2".to_string(),
+                    line: 1
+                },
+                simple_token(TokenType::RightBracket, 1),
                 simple_token(TokenType::NewLine, 1),
                 simple_token(TokenType::Eof, 1)
             ]
