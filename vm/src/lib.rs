@@ -110,8 +110,19 @@ impl VM {
             // Loading
             OP_LOAD_INT16 => self.load_int16(instruction),
 
-            // Math
+            // Arithmetic
             OP_ADD_INT => self.add_int(instruction),
+            OP_SUB_INT => self.sub_int(instruction),
+            OP_MUL_INT => self.mul_int(instruction),
+            OP_DIV_INT => self.div_int(instruction),
+            OP_MOD_INT => self.mod_int(instruction),
+            OP_POW_INT => self.pow_int(instruction),
+            OP_ADD_FLOAT => self.add_float(instruction),
+            OP_SUB_FLOAT => self.sub_float(instruction),
+            OP_MUL_FLOAT => self.mul_float(instruction),
+            OP_DIV_FLOAT => self.div_float(instruction),
+            OP_MOD_FLOAT => self.mod_float(instruction),
+            OP_POW_FLOAT => self.pow_float(instruction),
 
             // Allocations
             OP_ALLOC_REG => self.allocate_registers(instruction),

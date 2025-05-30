@@ -4,7 +4,7 @@ use instructions::{Instruction, InstructionDecoder};
 impl VM {
     #[inline(always)]
     pub(crate) fn set_register(&mut self, destination: Instruction, value: Register) {
-        self.registers[destination as usize] = value
+        self.registers[destination as usize + self.register_offset] = value
     }
 
     #[inline(always)]
@@ -23,7 +23,7 @@ impl VM {
 
     #[inline(always)]
     pub(crate) fn get_register(&mut self, source: Instruction) -> Register {
-        self.registers[source as usize]
+        self.registers[source as usize + self.register_offset]
     }
 
     #[inline(always)]
