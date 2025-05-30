@@ -1,7 +1,6 @@
 use crate::expressions::Expression;
 use crate::span::AstSpan;
 use crate::visitor::ExpressionVisitor;
-use scanner::Token;
 use types::KirinType;
 
 #[derive(Debug, Clone)]
@@ -11,6 +10,7 @@ pub struct Call {
     pub arguments: Vec<Expression>,
     pub inferred_type: Option<KirinType>,
 }
+
 impl Call {
     pub fn new(callee: Expression, span: AstSpan, arguments: Vec<Expression>) -> Self {
         Self {

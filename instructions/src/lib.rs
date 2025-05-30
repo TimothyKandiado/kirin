@@ -1,11 +1,11 @@
+mod constants;
+mod decoder;
 mod encoder;
 mod opcodes;
-mod decoder;
-mod constants;
 
-pub use opcodes::OpCode;
-pub use encoder::InstructionBuilder;
 pub use decoder::InstructionDecoder;
+pub use encoder::InstructionBuilder;
+pub use opcodes::OpCode;
 
 pub type Instruction = u32;
 
@@ -14,13 +14,13 @@ mod instruction_tests {
     use crate::{InstructionBuilder, InstructionDecoder, OpCode};
 
     #[test]
-    fn test_opcode_encoding_decoding () {
+    fn test_opcode_encoding_decoding() {
         let opcodes = vec![
             OpCode::None,
-            OpCode::LoadFloat64,
+            OpCode::LoadConst,
             OpCode::AddInt,
             OpCode::ModFloat,
-            OpCode::DivInt
+            OpCode::DivInt,
         ];
 
         for opcode in opcodes {
@@ -51,7 +51,8 @@ mod instruction_tests {
     #[test]
     fn test_source1_encoding_decoding() {
         for value in 0..256u32 {
-            let instruction = InstructionBuilder::binary_operation(OpCode::AddInt, value, value, value);
+            let instruction =
+                InstructionBuilder::binary_operation(OpCode::AddInt, value, value, value);
 
             let decoded_value = InstructionDecoder::decode_source_1(instruction);
 
@@ -62,7 +63,8 @@ mod instruction_tests {
     #[test]
     fn test_source2_encoding_decoding() {
         for value in 0..256u32 {
-            let instruction = InstructionBuilder::binary_operation(OpCode::AddInt, value, value, value);
+            let instruction =
+                InstructionBuilder::binary_operation(OpCode::AddInt, value, value, value);
 
             let decoded_value = InstructionDecoder::decode_source_2(instruction);
 
@@ -81,6 +83,24 @@ mod instruction_tests {
                 .build();
 
             let decoded_value = InstructionDecoder::decode_16bit_value(instruction);
+
+            assert_eq!(value, decoded_value);
+        }
+    }
+
+    #[test]
+    fn test_16bit_int_encoding_decoding() {
+        let max = i16::MAX;
+        let min = i16::MIN;
+
+        for value in min..=max {
+            let instruction = InstructionBuilder::new()
+                .set_opcode(OpCode::LoadInt16)
+                .set_destination_register(0)
+                .set_16bit_int(value)
+                .build();
+
+            let decoded_value = InstructionDecoder::decode_16bit_int(instruction);
 
             assert_eq!(value, decoded_value);
         }
