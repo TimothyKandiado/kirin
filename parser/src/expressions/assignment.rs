@@ -1,8 +1,8 @@
 use crate::expressions::Expression;
+use crate::span::AstSpan;
 use crate::visitor::ExpressionVisitor;
 use scanner::Token;
 use types::KirinType;
-use crate::span::AstSpan;
 
 #[derive(Debug, Clone)]
 pub struct Assign {

@@ -8,5 +8,5 @@ pub use declaration::VariableDeclaration;
 pub enum Statement {
     None,
     ExpressionStatement(Expression),
-    VarDeclaration(VariableDeclaration)
+    VarDeclaration(VariableDeclaration),
 }

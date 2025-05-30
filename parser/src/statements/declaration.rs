@@ -5,11 +5,15 @@ use crate::span::AstSpan;
 pub struct VariableDeclaration {
     pub name: String,
     pub initializer: Option<Expression>,
-    pub span: AstSpan
+    pub span: AstSpan,
 }
 
 impl VariableDeclaration {
     pub fn new(name: String, initializer: Option<Expression>, span: AstSpan) -> Self {
-        Self { name, initializer, span }
+        Self {
+            name,
+            initializer,
+            span,
+        }
     }
 }

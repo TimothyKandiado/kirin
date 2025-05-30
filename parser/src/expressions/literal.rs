@@ -16,7 +16,7 @@ impl Literal {
     }
 
     pub fn new(value: ParsedValue, span: AstSpan) -> Self {
-        let inferred_type  = value.try_infer_type();
+        let inferred_type = value.try_infer_type();
 
         Self {
             value,

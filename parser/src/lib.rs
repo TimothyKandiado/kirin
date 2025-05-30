@@ -1,4 +1,6 @@
-use crate::expressions::{Assign, Binary, BinaryOp, Call, Expression, Grouping, Literal, Unary, UnaryOp, Variable};
+use crate::expressions::{
+    Assign, Binary, BinaryOp, Call, Expression, Grouping, Literal, Unary, UnaryOp, Variable,
+};
 use crate::span::AstSpan;
 use crate::statements::{Statement, VariableDeclaration};
 use crate::value::ParsedValue;
@@ -61,12 +63,12 @@ impl Parser {
     }
 
     fn declaration(&mut self) -> Result<Statement, KirinError> {
-        if self.match_tokens(&[TokenType::NewLine]) { // skip trailing new line tokens
+        if self.match_tokens(&[TokenType::NewLine]) {
+            // skip trailing new line tokens
             self.declaration()
         } else if self.match_tokens(&[TokenType::Let]) {
             self.var_declaration()
-        }
-        else if self.check_next(TokenType::ColonEqual) {
+        } else if self.check_next(TokenType::ColonEqual) {
             self.var_declaration()
         } else {
             self.statement()
@@ -74,8 +76,7 @@ impl Parser {
     }
 
     fn var_declaration(&mut self) -> Result<Statement, KirinError> {
-        let name = self
-            .consume(TokenType::Identifier)?.clone();
+        let name = self.consume(TokenType::Identifier)?.clone();
 
         let mut initializer = None;
 
@@ -83,15 +84,13 @@ impl Parser {
             initializer = Some(self.expression()?);
         }
 
-        self.consume(
-            TokenType::NewLine
-        )?;
+        self.consume(TokenType::NewLine)?;
 
         let span = AstSpan::from_token_span(name.span, self.filename.clone());
         Ok(Statement::VarDeclaration(VariableDeclaration {
             name: name.lexeme.clone(),
             initializer,
-            span
+            span,
         }))
     }
 
@@ -142,9 +141,8 @@ impl Parser {
 
             let right = self.and()?;
 
-
-
-            let binary = Expression::Binary(Box::new(Binary::new(expression, right, operator, span)));
+            let binary =
+                Expression::Binary(Box::new(Binary::new(expression, right, operator, span)));
             return Ok(binary);
         }
 
@@ -162,7 +160,8 @@ impl Parser {
 
             let right = self.equality()?;
 
-            let binary = Expression::Binary(Box::new(Binary::new(expression, right, operator, span)));
+            let binary =
+                Expression::Binary(Box::new(Binary::new(expression, right, operator, span)));
             return Ok(binary);
         }
 
@@ -180,7 +179,8 @@ impl Parser {
 
             let right = self.comparison()?;
 
-            let binary = Expression::Binary(Box::new(Binary::new(expression, right, operator, span)));
+            let binary =
+                Expression::Binary(Box::new(Binary::new(expression, right, operator, span)));
             return Ok(binary);
         }
 
@@ -203,7 +203,8 @@ impl Parser {
 
             let right = self.addition()?;
 
-            let binary = Expression::Binary(Box::new(Binary::new(expression, right, operator, span)));
+            let binary =
+                Expression::Binary(Box::new(Binary::new(expression, right, operator, span)));
             return Ok(binary);
         }
 
@@ -221,7 +222,8 @@ impl Parser {
 
             let right = self.multiplication()?;
 
-            expression = Expression::Binary(Box::new(Binary::new(expression, right, operator, span)))
+            expression =
+                Expression::Binary(Box::new(Binary::new(expression, right, operator, span)))
         }
 
         Ok(expression)
@@ -238,7 +240,8 @@ impl Parser {
 
             let right = self.unary()?;
 
-            expression = Expression::Binary(Box::new(Binary::new(expression, right, operator, span)))
+            expression =
+                Expression::Binary(Box::new(Binary::new(expression, right, operator, span)))
         }
 
         Ok(expression)
@@ -255,7 +258,8 @@ impl Parser {
 
             let right = self.unary()?;
 
-            expression = Expression::Binary(Box::new(Binary::new(expression, right, operator, span)))
+            expression =
+                Expression::Binary(Box::new(Binary::new(expression, right, operator, span)))
         }
 
         Ok(expression)
@@ -270,7 +274,9 @@ impl Parser {
 
             let right = self.unary()?;
 
-            return Ok(Expression::Unary(Box::new(Unary::new(right, operator, span))));
+            return Ok(Expression::Unary(Box::new(Unary::new(
+                right, operator, span,
+            ))));
         }
 
         self.call()
@@ -308,8 +314,7 @@ impl Parser {
     fn finish_call(&mut self, callee: Expression) -> Result<Expression, KirinError> {
         let arguments = self.get_arguments()?;
 
-        let paren = self
-            .consume(TokenType::RightParen)?;
+        let paren = self.consume(TokenType::RightParen)?;
 
         let span = AstSpan::from_token_span(paren.span, self.filename.clone());
         Ok(Expression::Call(Box::new(Call::new(
@@ -324,7 +329,10 @@ impl Parser {
 
             let span = AstSpan::from_token_span(token.span, self.filename.clone());
 
-            return Ok(Expression::Variable(Box::new(Variable::new(token.lexeme, span))));
+            return Ok(Expression::Variable(Box::new(Variable::new(
+                token.lexeme,
+                span,
+            ))));
         }
 
         // Handle literals
@@ -358,7 +366,10 @@ impl Parser {
         }
 
         let current = self.peek().clone();
-        Err(self.error_from_token_span(current.span, &format!("expected Expression but found `{:?}`", current.token_type)))
+        Err(self.error_from_token_span(
+            current.span,
+            &format!("expected Expression but found `{:?}`", current.token_type),
+        ))
     }
 
     fn synchronize(&mut self) {
@@ -404,16 +415,16 @@ impl Parser {
         self.previous()
     }
 
-    fn consume(
-        &mut self,
-        token_type: TokenType,
-    ) -> Result<&Token, KirinError> {
+    fn consume(&mut self, token_type: TokenType) -> Result<&Token, KirinError> {
         if self.check(token_type) {
             return Ok(self.advance());
         }
 
         let previous = self.previous().clone();
-        Err(self.error_from_token_span(previous.span, &format!("expected {:?}, got {:?}", token_type, previous.token_type)))
+        Err(self.error_from_token_span(
+            previous.span,
+            &format!("expected {:?}, got {:?}", token_type, previous.token_type),
+        ))
     }
 
     /// Check if the current token is of the given type

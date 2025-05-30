@@ -7,6 +7,10 @@ name = "errors"
 version = "0.1.0"
 
 [[package]]
+name = "instructions"
+version = "0.1.0"
+
+[[package]]
 name = "parser"
 version = "0.1.0"
 dependencies = [

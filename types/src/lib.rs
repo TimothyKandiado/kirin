@@ -11,5 +11,5 @@ pub enum KirinType {
     Tuple(Vec<KirinType>),
     Struct(String, Vec<KirinType>),
     Vector(Box<KirinType>),
-    Array(Box<KirinType>, usize)
+    Array(Box<KirinType>, usize),
 }

@@ -1,7 +1,7 @@
-use errors::{KirinError, SpannedError};
 use crate::expressions::Expression;
 use crate::span::AstSpan;
 use crate::visitor::ExpressionVisitor;
+use errors::{KirinError, SpannedError};
 use scanner::{Token, TokenType};
 use types::KirinType;
 
@@ -31,7 +31,7 @@ impl Unary {
 #[derive(Clone, Copy, Debug)]
 pub enum UnaryOp {
     Negate,
-    Not
+    Not,
 }
 
 impl UnaryOp {
@@ -40,15 +40,11 @@ impl UnaryOp {
             TokenType::Minus => Ok(UnaryOp::Negate),
             TokenType::Not => Ok(UnaryOp::Not),
 
-            _ => Err(KirinError::Parse(
-                SpannedError{
-                    message: format!(
-                        "token `{:?}` is not a unary operator", token.token_type
-                    ),
-                    line: token.span.line,
-                    column: token.span.column
-                }
-            ))
+            _ => Err(KirinError::Parse(SpannedError {
+                message: format!("token `{:?}` is not a unary operator", token.token_type),
+                line: token.span.line,
+                column: token.span.column,
+            })),
         }
     }
 }

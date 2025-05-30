@@ -9,7 +9,6 @@ fn main() {
     } else {
         run_file(args.get(1).unwrap())
     }
-
 }
 
 fn run_file(path: &str) {

@@ -1,9 +1,9 @@
-use errors::{KirinError, SpannedError};
 use crate::expressions::Expression;
+use crate::span::AstSpan;
 use crate::visitor::ExpressionVisitor;
+use errors::{KirinError, SpannedError};
 use scanner::{Token, TokenType};
 use types::KirinType;
-use crate::span::AstSpan;
 
 #[derive(Debug, Clone)]
 pub struct Binary {
@@ -11,7 +11,7 @@ pub struct Binary {
     pub right: Expression,
     pub operator: BinaryOp,
     pub inferred_type: Option<KirinType>,
-    pub span: AstSpan
+    pub span: AstSpan,
 }
 
 impl Binary {
@@ -45,7 +45,7 @@ pub enum BinaryOp {
     GreaterEqual,
     Less,
     LessEqual,
-    Modulus
+    Modulus,
 }
 
 impl BinaryOp {
@@ -65,14 +65,11 @@ impl BinaryOp {
             TokenType::NotEqual => Ok(BinaryOp::NotEqual),
             TokenType::EqualEqual => Ok(BinaryOp::Equal),
 
-            _ => Err(KirinError::Parse(
-                SpannedError {
-                    message: format!("token `{:?}` is not a binary operation", token.token_type),
-                    line: token.span.line,
-                    column: token.span.column,
-                }
-            ))
-
+            _ => Err(KirinError::Parse(SpannedError {
+                message: format!("token `{:?}` is not a binary operation", token.token_type),
+                line: token.span.line,
+                column: token.span.column,
+            })),
         }
     }
 }
