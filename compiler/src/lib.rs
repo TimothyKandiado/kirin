@@ -1,9 +1,11 @@
-use std::collections::HashMap;
 use errors::{KirinError, SpannedError};
 use instructions::{Instruction, InstructionBuilder, OpCode};
-use parser::expressions::{Assign, Binary, BinaryOp, Call, Expression, Grouping, Literal, Unary, Variable};
+use parser::expressions::{
+    Assign, Binary, BinaryOp, Call, Expression, Grouping, Literal, Unary, Variable,
+};
 use parser::statements::{Statement, VariableDeclaration};
 use parser::visitor::{ExpressionVisitor, StatementVisitor};
+use std::collections::HashMap;
 use types::KirinType;
 use vm::{Program, ProgramConstant};
 
@@ -12,7 +14,7 @@ enum Register {
     Variable(Option<KirinType>),
 }
 
-struct Compiler {
+pub struct Compiler {
     instructions: Vec<Instruction>,
     constants: Vec<ProgramConstant>,
     locals: Vec<HashMap<String, usize>>,
@@ -80,11 +82,16 @@ impl ExpressionVisitor for Compiler {
             BinaryOp::Multiply => OpCode::MulInt,
             BinaryOp::Divide => OpCode::DivInt,
 
-            _ => return Err(KirinError::Compile(SpannedError {
-                line: binary.span.line,
-                column: binary.span.column,
-                message: format!("binary operator `{:?}` not implemented in file: `{:?}`", binary.operator, binary.span.filename),
-            }))
+            _ => {
+                return Err(KirinError::Compile(SpannedError {
+                    line: binary.span.line,
+                    column: binary.span.column,
+                    message: format!(
+                        "binary operator `{:?}` not implemented in file: `{:?}`",
+                        binary.operator, binary.span.filename
+                    ),
+                }));
+            }
         };
 
         Ok(())

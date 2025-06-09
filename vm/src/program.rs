@@ -1,5 +1,4 @@
 use instructions::Instruction;
-use std::fs::Metadata;
 
 #[derive(Debug, Clone)]
 pub struct Program {

@@ -1,22 +1,22 @@
-use crate::expressions::{
-    Assign, Binary, BinaryOp, Call, Expression, Grouping, Literal, Unary, UnaryOp, Variable,
-};
-
-use crate::span::AstSpan;
-use crate::statements::{Statement, VariableDeclaration};
-use crate::value::ParsedValue;
-use errors::{KirinError, SpannedError};
-use scanner::{Token, TokenSpan, TokenType};
-
 pub mod expressions;
 pub mod span;
 pub mod statements;
 pub mod value;
 pub mod visitor;
 
+use expressions::{
+    Assign, Binary, BinaryOp, Call, Expression, Grouping, Literal, Unary, UnaryOp, Variable,
+};
+
+use errors::{KirinError, SpannedError};
+use scanner::{Token, TokenSpan, TokenType};
+use span::AstSpan;
+use statements::{Statement, VariableDeclaration};
+use value::ParsedValue;
+
 const MAX_PARAMETERS: usize = 8;
 
-struct Parser {
+pub struct Parser {
     tokens: Vec<Token>,
     filename: Option<String>,
     current: usize,

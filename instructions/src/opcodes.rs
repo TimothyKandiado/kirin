@@ -1,7 +1,7 @@
 #[repr(u8)]
 #[derive(Debug, Copy, Clone)]
 pub enum OpCode {
-    None = 0x00,
+    None,
 
     // Load Instructions
     LoadConst,

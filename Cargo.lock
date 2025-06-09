@@ -14,9 +14,11 @@ dependencies = [
 name = "compiler"
 version = "0.1.0"
 dependencies = [
+ "analyzer",
  "errors",
  "instructions",
  "parser",
+ "scanner",
  "types",
  "vm",
 ]

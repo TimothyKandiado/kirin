@@ -7,7 +7,7 @@ pub enum KirinError {
     Parse(SpannedError),
     Runtime(SpannedError),
     Compile(SpannedError),
-    Type(SpannedError)
+    Type(SpannedError),
 }
 
 impl Display for KirinError {
@@ -39,7 +39,6 @@ impl Display for KirinError {
                 "[Type Error] [line: {}, column: {}]: {}\n",
                 error.line, error.column, error.message,
             ),
-
         }
     }
 }
