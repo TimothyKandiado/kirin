@@ -1,17 +1,18 @@
 use crate::expressions::{
     Assign, Binary, BinaryOp, Call, Expression, Grouping, Literal, Unary, UnaryOp, Variable,
 };
+
 use crate::span::AstSpan;
 use crate::statements::{Statement, VariableDeclaration};
 use crate::value::ParsedValue;
 use errors::{KirinError, SpannedError};
 use scanner::{Token, TokenSpan, TokenType};
 
-mod expressions;
-mod span;
-mod statements;
-mod value;
-mod visitor;
+pub mod expressions;
+pub mod span;
+pub mod statements;
+pub mod value;
+pub mod visitor;
 
 const MAX_PARAMETERS: usize = 8;
 

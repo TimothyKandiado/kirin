@@ -24,6 +24,8 @@ pub const OP_POW_FLOAT: u8 = OpCode::PowFloat as u8;
 // Type Casting
 pub const OP_INT_TO_ANY: u8 = OpCode::IntToAny as u8;
 pub const OP_FLOAT_TO_ANY: u8 = OpCode::FloatToAny as u8;
+pub const OP_INT_TO_FLOAT: u8 = OpCode::IntToFloat as u8;
+pub const OP_FLOAT_TO_INT: u8 = OpCode::FloatToInt as u8;
 
 // Frames
 pub const OP_INIT_FRAME: u8 = OpCode::InitFrame as u8;

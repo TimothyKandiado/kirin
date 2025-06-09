@@ -1,4 +1,4 @@
 [workspace]
 resolver = "2"
 
-members = [ "errors", "instructions", "parser","scanner", "types", "vm"]
+members = [ "compiler", "errors", "analyzer", "instructions", "parser","scanner", "types", "vm"]

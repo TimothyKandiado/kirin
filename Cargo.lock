@@ -3,6 +3,25 @@
 version = 4
 
 [[package]]
+name = "analyzer"
+version = "0.1.0"
+dependencies = [
+ "errors",
+ "parser",
+]
+
+[[package]]
+name = "compiler"
+version = "0.1.0"
+dependencies = [
+ "errors",
+ "instructions",
+ "parser",
+ "types",
+ "vm",
+]
+
+[[package]]
 name = "errors"
 version = "0.1.0"
 

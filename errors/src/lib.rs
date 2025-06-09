@@ -6,6 +6,8 @@ pub enum KirinError {
     Scan(SpannedError),
     Parse(SpannedError),
     Runtime(SpannedError),
+    Compile(SpannedError),
+    Type(SpannedError)
 }
 
 impl Display for KirinError {
@@ -27,6 +29,17 @@ impl Display for KirinError {
                 "[Runtime Error] [line: {}, column: {}]: {}\n",
                 error.line, error.column, error.message,
             ),
+            Self::Compile(error) => write!(
+                f,
+                "[Compile Error] [line: {}, column: {}]: {}\n",
+                error.line, error.column, error.message,
+            ),
+            Self::Type(error) => write!(
+                f,
+                "[Type Error] [line: {}, column: {}]: {}\n",
+                error.line, error.column, error.message,
+            ),
+
         }
     }
 }

@@ -24,6 +24,8 @@ pub enum OpCode {
     // Casting
     IntToAny,
     FloatToAny,
+    IntToFloat,
+    FloatToInt,
 
     // Frames
     InitFrame,

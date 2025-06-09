@@ -7,8 +7,10 @@
       <sourceFolder url="file://$MODULE_DIR$/scanner/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/types/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/compiler/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/instructions/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/vm/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/analyzer/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />

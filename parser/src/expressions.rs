@@ -37,7 +37,7 @@ impl Expression {
             Self::Literal(literal) => literal.accept(visitor),
             Self::Variable(variable_expression) => variable_expression.accept(visitor),
             Self::Assign(assign) => assign.accept(visitor),
-            Self::Call(math_function) => math_function.accept(visitor),
+            Self::Call(callable) => callable.accept(visitor),
         }
     }
 }

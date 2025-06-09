@@ -8,6 +8,7 @@ pub enum KirinType {
     Int,
     Float,
     Bool,
+    Variable()
 }
 
 impl KirinType {

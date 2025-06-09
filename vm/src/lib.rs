@@ -131,6 +131,8 @@ impl VM {
             // Casting
             OP_INT_TO_ANY => self.cast_int_to_any(instruction),
             OP_FLOAT_TO_ANY => self.cast_float_to_any(instruction),
+            OP_INT_TO_FLOAT => self.cast_int_to_float(instruction),
+            OP_FLOAT_TO_INT => self.cast_float_to_int(instruction),
 
             // Control flow
             OP_RETURN => self.do_return(instruction),
